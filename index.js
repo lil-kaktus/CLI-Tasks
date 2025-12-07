@@ -5,7 +5,7 @@ import tasksList from './tasks.json' with {type: "json"}
 import { styleText } from 'node:util'
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
-import {fileURLToPath} from 'node:url'
+import { fileURLToPath } from 'node:url'
 
 let tasks = tasksList.tasks
 
@@ -22,7 +22,7 @@ function logFormattedList() {
         console.log(greetingStr)
 
         for (let i = 0; i < tasks.length; i++) {
-            console.log(styleText(tasks[i].isDone ? ["strikethrough", "italic"] : ["reset"], `${String(i + 1)}) - ${tasks[i].text}`) + styleText(["reset"],tasks[i].isDone ? " ✔" : ""))
+            console.log(styleText(tasks[i].isDone ? ["strikethrough", "italic"] : ["reset"], `${String(i + 1)}) - ${tasks[i].text}`) + styleText(["reset"], tasks[i].isDone ? " ✔" : ""))
         }
     }
     else {
@@ -36,7 +36,7 @@ function processCommand([key, value]) {
 
     if (key === "add") {
         if (value && typeof value === "string") {
-            tasks.push({ text: value, isDone: false})
+            tasks.push({ text: value, isDone: false })
 
             console.log(styleText(['green', 'underline'], 'ADD : New task successfully added !'))
 
@@ -50,8 +50,6 @@ function processCommand([key, value]) {
         if (value && typeof value == "number") {
 
             const finalValue = Math.round(value)
-
-            console.log(finalValue)
 
             tasks = tasks.filter((task, index) => index != finalValue - 1)
 
@@ -68,18 +66,28 @@ function processCommand([key, value]) {
 
             const finalValue = Math.round(value)
 
-            console.log(finalValue)
-
-            tasks = tasks.map((task, index) => (index == finalValue - 1 ? 
-                {...task, isDone: !(task.isDone)} : task
+            tasks = tasks.map((task, index) => (index == finalValue - 1 ?
+                { ...task, isDone: !(task.isDone) } : task
             ))
 
-            console.log(styleText(['green', 'underline'], `REMOVE : Task n°${String(finalValue)} successfully removed !`))
+            console.log(styleText(['green', 'underline'], `REMOVE : Task n°${String(finalValue)} successfully checked !`))
 
             isUpdatableToJson = true
         }
         else {
             console.log(styleText('red', 'ERROR : no value provided'))
+        }
+    }
+    else if (key == "HELP") {
+        const commands = [
+            ["Here is a list of every available commands : \n"],
+            ["--add [taskName]", " : adds a new task labelled with [taskName] at the end of your checklist."],
+            ["--remove [taskId]", " : removes the task with the [taskId] matching id number."],
+            ["--check [taskId]", " : marks the [taskId] task as checked if un-checked, or as un-checked if already checked."],
+            ["--HELP"," : logs every available commands."]
+        ]
+        for (const command of commands) {
+            console.log(styleText(['white', 'bold'], command[0]) + styleText('white', command[1] ? command[1] : ""))
         }
     }
 
@@ -94,7 +102,6 @@ if (Object.entries(argv).length > 2) { //checks if there are arguments
 
     for (const [key, value] of Object.entries(argv)) {
         if (key !== "_" && key !== "$0") { //rules out other non-user commands
-            console.log(argv)
             processCommand([key, value])
         }
     }
